@@ -226,13 +226,69 @@ def get_logger(model_dir, filename="train.log"):
   return logger
 
 
+from text import cleaners
+from text.symbols import symbols
+class Dictionary():
+    def __init__(self, symbols):
+        self.symbols = symbols
+        # Mappings from symbol to numeric ID and vice versa:
+        self._symbol_to_id = {s: i for i, s in enumerate(symbols)}
+        self._id_to_symbol = {i: s for i, s in enumerate(symbols)}
+
+    def text_to_sequence(self, text, cleaner_names):
+        '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
+            Args:
+              text: string to convert to a sequence
+              cleaner_names: names of the cleaner functions to run the text through
+            Returns:
+              List of integers corresponding to the symbols in the text
+        '''
+        sequence = []
+
+        clean_text = self._clean_text(text, cleaner_names)
+        for symbol in clean_text:
+            # Use space to represent unknown token
+            symbol_id = self._symbol_to_id.get(symbol, self._symbol_to_id.get(' '))
+            sequence += [symbol_id]
+        return sequence
+
+    def cleaned_text_to_sequence(self, cleaned_text):
+        sequence = [self._symbol_to_id[symbol] for symbol in cleaned_text]
+        return sequence
+
+    def sequence_to_text(self, sequence):
+        '''Converts a sequence of IDs back to a string'''
+        result = ''
+        for symbol_id in sequence:
+            s = self._id_to_symbol[symbol_id]
+            result += s
+        return result
+
+    def _clean_text(self, text, cleaner_names):
+        for name in cleaner_names:
+            cleaner = getattr(cleaners, name)
+            if not cleaner:
+                raise Exception('Unknown cleaner: %s' % name)
+            text = cleaner(text)
+        return text
+
+
 class HParams():
   def __init__(self, **kwargs):
     for k, v in kwargs.items():
       if type(v) == dict:
         v = HParams(**v)
       self[k] = v
-    
+    # build dictionary
+    if 'symbols' in kwargs:
+        # prepend the pad symbol
+        self.dict = Dictionary('_' + kwargs['symbols'])
+    else:
+        # only init dict under config.data
+        if 'training_files' in kwargs:
+            # fallback to default one
+            self.dict = Dictionary(symbols)
+
   def keys(self):
     return self.__dict__.keys()
 
