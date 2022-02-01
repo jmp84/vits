@@ -1,5 +1,20 @@
 # VITS: Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech
 
+### IWSLT Instructions
+
+## Pre-requisites
+0. Python >= 3.6
+0. Clone this repository
+0. Install python requirements. Please refer [requirements.txt](requirements.txt)
+    1. You may need to install espeak first: `apt-get install espeak`
+0. Build Monotonic Alignment Search and run preprocessing if you use your own datasets.
+```sh
+# Cython-version Monotonoic Alignment Search
+cd monotonic_align
+python setup.py build_ext --inplace
+0. Download the [pretrained model](https://dl.fbaipublicfiles.com/s2st/G_24000.pth) to the root of the repository
+0. Run the `inference_iwslt.ipynb` notebook
+
 ### Jaehyeon Kim, Jungil Kong, and Juhee Son
 
 In our recent [paper](https://arxiv.org/abs/2106.06103), we propose VITS: Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech.
