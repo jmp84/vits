@@ -12,6 +12,7 @@
 # Cython-version Monotonoic Alignment Search
 cd monotonic_align
 python setup.py build_ext --inplace
+```
 0. Download the [pretrained model](https://dl.fbaipublicfiles.com/s2st/G_24000.pth) to the root of the repository
 0. Run the `inference_iwslt.ipynb` notebook
 
